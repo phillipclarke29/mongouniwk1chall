@@ -21,19 +21,36 @@ var express = require('express'),
 
   }
 
-app.get('/', function(req, res, next) {
-  res.render('MovieForm', { 'fruits' : ['apple', 'orange', 'banana', 'peach' ] });
+app.get('/add_movie', function(req, res, next) {
+  res.render('MovieForm');
 });
 
+app.get('/all_movies', function(req, res, next) {
+   db.collection('videos').find({}).toArray(function(err, docs) {
+     console.log(docs);
+    res.render('all_movies', { 'videos': docs });
+    });
+});
+
+
 app.post('/add_movie', function(req, res, next) {
+  console.log(req.body);
+
     var title = req.body.title;
-    var year = req.ddoby.year;
+    var year = req.body.year;
     var imdb = req.body.imdb;
-    if (typeof title == 'undefined' || typeof year == 'undefined' || typeof imdb == 'undefined' ) {
+    if (title == '' || year == '' || imdb == '') {
         next('Please enter a value for each field');
     }
     else {
-        res.send("Your favorite fruit is " + favorite);
+      var collection = db.collection("videos");
+      // Insert a single document
+      collection.insert({
+        title : req.body.title,
+        year : req.body.year,
+        imdb : req.body.imdb,
+      });
+      res.send("Thank you for adding a movie");
     }
 });
 
